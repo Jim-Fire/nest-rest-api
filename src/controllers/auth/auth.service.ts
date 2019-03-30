@@ -7,19 +7,24 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   async createToken() {
-    const user: JwtPayload = { email: 'test@email.com' };
+    const user: JwtPayload = {
+      email: 'test@email.com',
+      someValue: 42,
+    };
     const accessToken = this.jwtService.sign(user, {
-        expiresIn: 20,
+      expiresIn: 3600,
     });
 
     return {
-      accessToken,
+      accessToken
     };
   }
 
   async validateUser(payload: JwtPayload): Promise<any> {
     // put some validation logic here
     // for example query user by id/email/username
+
+    console.log('payload', payload);
     return { result: true };
   }
 }
