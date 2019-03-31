@@ -11,9 +11,6 @@ import { AppKeys } from 'src/config/keys';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secretOrPrivateKey: AppKeys.JWT_SECRET,
-      signOptions: {
-        expiresIn: 3600,
-      },
     }),
   ],
   controllers: [AuthController],

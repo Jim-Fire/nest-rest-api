@@ -12,11 +12,11 @@ export class AuthService {
       someValue: 42,
     };
     const accessToken = this.jwtService.sign(user, {
-      expiresIn: 3600,
+      // expiresIn: 3600,
     });
 
     return {
-      accessToken
+      accessToken,
     };
   }
 

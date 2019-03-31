@@ -12,7 +12,11 @@ import { AuthModule } from 'src/controllers/auth/auth.module';
 import { AppKeys } from './config/keys';
 
 @Module({
-  imports: [AuthModule, ItemsModule, MongooseModule.forRoot(AppKeys.MONGO_URI)],
+  imports: [
+    AuthModule,
+    ItemsModule,
+    MongooseModule.forRoot(AppKeys.MONGO_URI, { useNewUrlParser: true }),
+  ],
   controllers: [AppController, ItemsController, AuthController],
   providers: [AppService, ItemsService, AuthService],
 })
