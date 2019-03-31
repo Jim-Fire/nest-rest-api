@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 
@@ -9,6 +9,11 @@ export class AuthController {
   @Get('token')
   createToken() {
     return this.authService.createToken();
+  }
+
+  @Post('signup')
+  registerUser(){
+    return this.authService.createNewUser();
   }
 
   @Get('data')

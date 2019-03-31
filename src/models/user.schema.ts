@@ -24,7 +24,7 @@ export const UserSchema = new mongoose.Schema({
       validator: v => /^[a-zA-Z]{3,128}$/.test(v),
       message: props => `${props.value}${ValidationError.USER_NAME}`,
     },
-    minlength: 3,
+    minlength: [3,'THIS WORKS'],
     maxlength: 128,
     required: [true, ValidationError.USER_NAME_REQUIRED],
   },
