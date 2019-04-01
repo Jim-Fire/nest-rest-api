@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import timestamp from 'mongoose-timestamp';
+import * as timestamp from 'mongoose-timestamp';
 import { ValidationError } from 'src/util';
 
 export const UserSchema = new mongoose.Schema({
@@ -24,14 +24,20 @@ export const UserSchema = new mongoose.Schema({
       validator: v => /^[a-zA-Z]{3,128}$/.test(v),
       message: props => `${props.value}${ValidationError.USER_NAME}`,
     },
-    minlength: [3,'THIS WORKS'],
+    minlength: 3,
     maxlength: 128,
     required: [true, ValidationError.USER_NAME_REQUIRED],
   },
-  role: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
+  roles: [{
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+  }],
 });
 
 UserSchema.plugin(timestamp);
