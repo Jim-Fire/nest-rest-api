@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User, JwtPayload, Role, AppRoles, Todo, TodoList } from 'src/types';
 import { Schema } from 'src/models/schemas';
 import { apiExceptions } from 'src/util';
-//import { CreateUpdateTodoDto } from './dto/create-update-todo.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -30,5 +30,9 @@ export class UserService {
     } catch (e) {
       return new HttpException('Some server error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async update(updateUserDto: UpdateUserDto, id: string): Promise<User | HttpException> {
+    return await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
   }
 }
