@@ -32,14 +32,10 @@ export class AuthService {
     };
   }
 
-  async validateUser(payload: JwtPayload): Promise<User> {
-    // put some validation logic here
-    // for example query user by id/email/username
+  async findUserFromTokenMiddleware(payload: JwtPayload): Promise<User> {
     const { email } = payload;
 
-    const user: User = await this.userModel.findOne({ email });
-
-    return user;
+    return await this.userModel.findOne({ email });
   }
 
   async createNewUser(newuser: User): Promise<User | HttpException> {
