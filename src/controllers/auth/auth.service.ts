@@ -5,13 +5,14 @@ import { Injectable, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, JwtPayload, Role, AppRoles } from 'src/types';
 import { apiExceptions } from 'src/util';
+import { Schema } from 'src/models/schemas';
 import { AuthUserDto } from './dto/auth-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectModel(Schema.USER) private readonly userModel: Model<User>,
   ) {}
 
   async authenticate(user: AuthUserDto): Promise<object | HttpException> {
@@ -49,7 +50,7 @@ export class AuthService {
       throw new HttpException(apiExceptions.userExist, HttpStatus.BAD_REQUEST);
     }
 
-    const userRole = new Role(AppRoles.USER, 'User');
+    const userRole = new Role(AppRoles.ADMIN, 'Admin');
 
     const user = new this.userModel({
       ...newuser,

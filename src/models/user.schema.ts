@@ -30,7 +30,7 @@ export const UserSchema = new mongoose.Schema({
   },
   roles: [{
     id: {
-      type: Number,
+      type: String,
       required: true,
     },
     name: {
@@ -38,6 +38,6 @@ export const UserSchema = new mongoose.Schema({
       required: true,
     },
   }],
-});
+}, { versionKey: false });
 
 UserSchema.plugin(timestamp);

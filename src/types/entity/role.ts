@@ -4,8 +4,8 @@ export interface IRole {
 }
 
 export enum AppRoles {
-  ADMIN,
-  USER,
+  ADMIN = 'ADMIN',
+  USER = 'USER',
 }
 
 export class Role implements IRole {
