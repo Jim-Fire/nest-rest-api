@@ -1,4 +1,3 @@
-import { ApiException } from 'src/types';
 
 export enum ValidationError {
     USER_NAME = ' is not a valid name!',
@@ -7,21 +6,35 @@ export enum ValidationError {
     USER_EMAIL_REQUIRED = 'User email required',
 }
 
-export const apiExceptions: ApiExceptionKeyMap = {
+export enum Alert {
+    SUCCESS = 'success',
+    INFO = 'info',
+    WARNING = 'warning',
+    ERROR = 'error',
+}
+
+export const apiMessages: MessagesMap = {
     userExist: {
-        error: 'AlreadyExist',
-        message: 'User with same email is already exist'
+        type: Alert.WARNING,
+        message: 'User with same email is already exist',
     },
     userWrongPassword: {
-        error: 'WrongCredentials',
+        type: Alert.WARNING,
         message: 'Wrong credentials for this user',
     },
     userNotFound: {
-        error: 'UserNotFound',
+        type: Alert.WARNING,
         message: 'User with providen email not found',
+    },
+    usersNotFound: {
+        type: Alert.WARNING,
+        message: 'No users found',
     },
 };
 
-interface ApiExceptionKeyMap {
-  [key: string]: ApiException;
+interface MessagesMap {
+  [key: string]: {
+    message: string;
+    type: Alert;
+  };
 }

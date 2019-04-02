@@ -11,7 +11,7 @@ export enum AppRoles {
 export class Role implements IRole {
   id: AppRoles;
   name: string;
-  constructor(id = AppRoles.USER, name = 'Unnamed role') {
+  constructor(id, name) {
     this.id = id;
     this.name = name;
   }

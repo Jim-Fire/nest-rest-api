@@ -1,10 +1,9 @@
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Injectable, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { User, JwtPayload, Role, AppRoles, Todo, TodoList } from 'src/types';
+import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Body, HttpStatus } from '@nestjs/common';
+import { User, JwtPayload, ServerResponse, ServerError } from 'src/types';
 import { Schema } from 'src/models/schemas';
-import { apiExceptions } from 'src/util';
+import { apiMessages } from 'src/util';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -13,26 +12,75 @@ export class UserService {
     @InjectModel(Schema.USER) private readonly userModel: Model<User>,
   ) {}
 
-  async findAll(): Promise<User[] | HttpException> {
-    return await this.userModel.find();
+  async findAll(): Promise<ServerResponse<User[] | ServerError>> {
+    try {
+      const users: User[] = await this.userModel.find();
+      if (users.length) {
+        return new ServerResponse(users, true);
+      } else {
+        return new ServerResponse(
+          new ServerError(apiMessages.usersNotFound, HttpStatus.NOT_FOUND),
+          false,
+        );
+      }
+    } catch (e) {
+      return new ServerResponse(
+        new ServerError(e.message, HttpStatus.INTERNAL_SERVER_ERROR),
+        false,
+      );
+    }
   }
 
-  async delete(id: string): Promise<User | HttpException> {
+  async delete(id: string): Promise<ServerResponse<User | ServerError>> {
     try {
       const user: User = await this.userModel.findOneAndDelete({
         _id: id,
       });
       if (user) {
-        return user;
+        return new ServerResponse(user, true);
       } else {
-        return new HttpException(`There is no user with id=${id}`, HttpStatus.NOT_FOUND);
+        return new ServerResponse(
+          new ServerError(
+            `There is no user with id=${id}`,
+            HttpStatus.NOT_FOUND,
+          ),
+          false,
+        );
       }
     } catch (e) {
-      return new HttpException('Some server error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ServerResponse(
+        new ServerError(e.message, HttpStatus.NOT_FOUND),
+        false,
+      );
     }
   }
 
-  async update(updateUserDto: UpdateUserDto, id: string): Promise<User | HttpException> {
-    return await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+  async update(
+    updateUserDto: UpdateUserDto,
+    id: string,
+  ): Promise<ServerResponse<User | ServerError>> {
+    try {
+      const user: User = await this.userModel.findByIdAndUpdate(
+        id,
+        updateUserDto,
+        { new: true },
+      );
+      if (user) {
+        return new ServerResponse(user, true);
+      } else {
+        return new ServerResponse(
+          new ServerError(
+            `There is no user with id=${id}`,
+            HttpStatus.NOT_FOUND,
+          ),
+          false,
+        );
+      }
+    } catch (e) {
+      return new ServerResponse(
+        new ServerError(e.message, HttpStatus.NOT_FOUND),
+        false,
+      );
+    }
   }
 }
