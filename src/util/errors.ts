@@ -18,9 +18,9 @@ export const apiMessages: MessagesMap = {
         type: Alert.WARNING,
         text: 'User with same email is already exist',
     },
-    userWrongPassword: {
-        type: Alert.WARNING,
-        text: 'Wrong credentials for this user',
+    userWrongCredentials: {
+        type: Alert.ERROR,
+        text: 'Wrong credentials!',
     },
     userNotFound: {
         type: Alert.WARNING,

@@ -92,10 +92,11 @@ export class AuthService {
       } else if (compared.error) {
         return new ServerErrorResponse(compared.error.message);
       } else {
-        return new ServerErrorResponse(apiMessages.userWrongPassword, HttpStatus.BAD_REQUEST);
+        return new ServerErrorResponse(apiMessages.userWrongCredentials, HttpStatus.BAD_REQUEST);
       }
     } catch (e) {
-      return new ServerErrorResponse(e.message);
+      console.log(`Izolated error: ${e.message}`);
+      return new ServerErrorResponse(apiMessages.userWrongCredentials);
     }
   }
 
