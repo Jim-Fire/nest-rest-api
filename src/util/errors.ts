@@ -16,25 +16,29 @@ export enum Alert {
 export const apiMessages: MessagesMap = {
     userExist: {
         type: Alert.WARNING,
-        message: 'User with same email is already exist',
+        text: 'User with same email is already exist',
     },
     userWrongPassword: {
         type: Alert.WARNING,
-        message: 'Wrong credentials for this user',
+        text: 'Wrong credentials for this user',
     },
     userNotFound: {
         type: Alert.WARNING,
-        message: 'User with providen email not found',
+        text: 'User with providen email not found',
+    },
+    userNotFoundById: {
+        type: Alert.WARNING,
+        text: 'There is no user with providen id',
     },
     usersNotFound: {
         type: Alert.WARNING,
-        message: 'No users found',
+        text: 'No users found',
     },
 };
 
 interface MessagesMap {
   [key: string]: {
-    message: string;
+    text: string;
     type: Alert;
   };
 }

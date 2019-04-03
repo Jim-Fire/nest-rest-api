@@ -1,16 +1,16 @@
-import { User } from 'src/types';
+import { PartialUser } from 'src/types';
 
 export interface Todo {
     title: string;
     description: string;
-    assignee: User[];
-    owner: User;
+    assignee: PartialUser[];
+    owner: PartialUser;
     list: TodoList;
     comments: Comment[];
 }
 
 export interface Comment {
-    user: User;
+    user: PartialUser;
     text: string;
 }
 

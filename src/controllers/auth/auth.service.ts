@@ -3,8 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User, JwtPayload, Role, AppRoles } from 'src/types';
-import { apiExceptions } from 'src/util';
+import {
+  User,
+  JwtPayload,
+  Role,
+  AppRoles,
+  PromisedResponse,
+  ServerErrorResponse,
+  ServerResponse,
+  AuthResponse,
+  AuthTokenResponse,
+} from 'src/types';
+import { CreateUserDto } from './dto/create-user.dto';
+import { apiMessages } from 'src/util';
 import { Schema } from 'src/models/schemas';
 import { AuthUserDto } from './dto/auth-user.dto';
 
@@ -15,21 +26,77 @@ export class AuthService {
     @InjectModel(Schema.USER) private readonly userModel: Model<User>,
   ) {}
 
-  async authenticate(user: AuthUserDto): Promise<object | HttpException> {
+  async createNewUser(newuser: CreateUserDto): PromisedResponse<boolean> {
+    try {
+      const { email } = newuser;
+      const exist = await this.userModel.findOne({ email });
 
-    const foundUser: User | HttpException = await this.authChallange(user);
+      if (exist) {
+        return new ServerErrorResponse(apiMessages.userExist, HttpStatus.BAD_REQUEST);
+      }
 
-    const payload: JwtPayload = {
-      email: user.email,
-    };
-    const accessToken = this.jwtService.sign(payload, {
-      // expiresIn: 3600,
-    });
+      const userRole = new Role(AppRoles.USER, 'User');
 
-    return {
-      accessToken,
-      user: foundUser,
-    };
+      const user = new this.userModel({
+        ...newuser,
+        roles: [{...userRole}],
+      });
+
+      return new Promise((res, rej) => {
+        try {
+          bcrypt.genSalt(10, (e, salt) => {
+            if (e) {
+              rej(new ServerErrorResponse(e.message));
+            }
+            bcrypt.hash(user.password, salt, async (e, hash) => {
+              if (e) {
+                rej(new ServerErrorResponse(e.message));
+              }
+
+              // Hash Password
+              user.password = hash;
+
+              // Save User
+              await user.save();
+              res(new ServerResponse(true, true));
+            });
+          });
+        } catch (e) {
+          rej(new ServerErrorResponse(e.message));
+        }
+      });
+    } catch (e) {
+      return new ServerErrorResponse(e.message);
+    }
+  }
+
+  async authenticate(userDto: AuthUserDto): PromisedResponse<AuthTokenResponse> {
+    try {
+      const { email, password } = userDto;
+
+      // Get user by email
+      const user: User = await this.userModel.findOne({ email });
+
+      const compared = await this.comparePassword(password, user.password);
+
+      if (compared.result) {
+        const payload: JwtPayload = {
+          email: userDto.email,
+        };
+
+        const accessToken = this.jwtService.sign(payload, {
+          // expiresIn: 3600,
+        });
+
+        return new AuthResponse(accessToken, user);
+      } else if (compared.error) {
+        return new ServerErrorResponse(compared.error.message);
+      } else {
+        return new ServerErrorResponse(apiMessages.userWrongPassword, HttpStatus.BAD_REQUEST);
+      }
+    } catch (e) {
+      return new ServerErrorResponse(e.message);
+    }
   }
 
   async findUserFromTokenMiddleware(payload: JwtPayload): Promise<User> {
@@ -38,70 +105,16 @@ export class AuthService {
     return await this.userModel.findOne({ email });
   }
 
-  async createNewUser(newuser: User): Promise<User | HttpException> {
-    const { email } = newuser;
-    const exist = await this.userModel.findOne({ email });
-
-    if ( exist ) {
-      throw new HttpException(apiExceptions.userExist, HttpStatus.BAD_REQUEST);
-    }
-
-    const userRole = new Role(AppRoles.ADMIN, 'Admin');
-
-    const user = new this.userModel({
-      ...newuser,
-      roles: [{...userRole}],
-    });
-
+  async comparePassword(password: string, hash: string): Promise<{ result: boolean; error?: any }> {
     return new Promise((res, rej) => {
-      bcrypt.genSalt(10, (err, salt) => {
-        if(err) {
-          rej(new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR));
+      // Match Password
+      bcrypt.compare(password, hash, (err, isMatch) => {
+        if (err) {
+          res({ result: false, error: err });
         }
-        bcrypt.hash(user.password, salt, async (err, hash) => {
-          if(err) {
-            rej(new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR));
-          }
-
-          // Hash Password
-          user.password = hash;
-          // Save User
-          try {
-            const newUser = await user.save();
-            res(newUser);
-          } catch (err) {
-            rej(new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR));
-          }
-        });
+        res({ result: isMatch });
       });
     });
   }
 
-  async authChallange(userDto: AuthUserDto): Promise<User | HttpException> {
-    return new Promise(async (res, rej) => {
-      try {
-        const { email, password } = userDto;
-
-        // Get user by email
-        const user = await this.userModel.findOne({ email });
-
-        // Match Password
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err) {
-            rej(new HttpException(err, HttpStatus.BAD_REQUEST));
-          }
-
-          if (isMatch) {
-            res(user);
-          } else {
-            // Pass didn't match
-            rej(new HttpException(apiExceptions.userWrongPassword, HttpStatus.BAD_REQUEST));
-          }
-        });
-      } catch (err) {
-        // Email not found
-        rej(new HttpException(apiExceptions.userNotFound, HttpStatus.BAD_REQUEST));
-      }
-    });
-  }
 }

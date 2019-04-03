@@ -7,3 +7,8 @@ export interface User {
   name: string;
   roles?: IRole[];
 }
+
+export interface PartialUser {
+  _id: string;
+  name: string;
+}

@@ -3,6 +3,8 @@ export * from './app/url';
 export * from './app/auth';
 export * from './app/extended';
 export * from './entity/response';
+export * from './entity/error.response';
+export * from './entity/auth.response';
 export * from './entity/item';
 export * from './entity/user';
 export * from './entity/todo';

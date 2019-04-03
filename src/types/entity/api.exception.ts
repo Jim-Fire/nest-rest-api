@@ -8,7 +8,7 @@ export interface ServerError {
 export class ServerError implements ServerError {
   status: HttpStatus;
   message: any;
-  constructor(message: any, status: HttpStatus) {
+  constructor(message: any, status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR) {
     this.message = message;
     this.status = status;
   }

@@ -4,7 +4,7 @@ import { Injectable, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, JwtPayload, Role, AppRoles, Todo, TodoList } from 'src/types';
 import { Schema } from 'src/models/schemas';
-import { apiExceptions } from 'src/util';
+import { apiMessages } from 'src/util';
 import { CreateUpdateTodoDto } from './dto/create-update-todo.dto';
 import { CreateUpdateTodoListDto } from './dto/create-update-todolist.dto';
 

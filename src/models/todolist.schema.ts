@@ -14,11 +14,7 @@ export const TodoListSchema = new mongoose.Schema({
     trim: true,
     minlength: 3,
     maxlength: 128,
-  },
-  owner: {
-    type: String,
-    required: true,
-  },
+  }
 }, { versionKey: false });
 
 TodoListSchema.plugin(timestamp);
